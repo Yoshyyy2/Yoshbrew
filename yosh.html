@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>YOSHbrew — Specialty Coffee</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --cream: #F5EFE0;
+  --espresso: #1A0F00;
+  --gold: #C8963E;
+  --gold-light: #E8BC6A;
+  --muted: #8B7355;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--espresso);
+  color: var(--cream);
+  font-family: 'Cormorant Garamond', serif;
+  overflow-x: hidden;
+  cursor: none;
+}
+
+/* ── CURSOR ── */
+#cur { position:fixed; width:12px; height:12px; background:var(--gold); border-radius:50%; pointer-events:none; z-index:9999; top:0; left:0; transform:translate(-50%,-50%); }
+#cur-ring { position:fixed; width:44px; height:44px; border:1px solid var(--gold); border-radius:50%; pointer-events:none; z-index:9998; top:0; left:0; transform:translate(-50%,-50%); }
+
+/* ── NAV ── */
+nav {
+  position:fixed; top:0; left:0; right:0; z-index:200;
+  padding:2rem 4rem; display:flex; justify-content:space-between; align-items:center;
+  transition: background 0.4s;
+}
+.nav-logo { font-size:1.6rem; font-weight:300; letter-spacing:0.4em; color:var(--gold-light); text-transform:uppercase; text-decoration:none; }
+.nav-links { display:flex; gap:3rem; list-style:none; }
+.nav-links a { color:var(--cream); text-decoration:none; font-family:'DM Mono',monospace; font-size:0.7rem; letter-spacing:0.2em; text-transform:uppercase; opacity:0.7; transition:opacity 0.3s, color 0.3s; cursor:none; }
+.nav-links a:hover { opacity:1; color:var(--gold-light); }
+.nav-btn { padding:0.6rem 1.6rem; background:var(--gold); color:var(--espresso)!important; opacity:1!important; font-family:'DM Mono',monospace; font-size:0.65rem!important; letter-spacing:0.2em; text-transform:uppercase; text-decoration:none; cursor:none; transition:background 0.3s!important; }
+.nav-btn:hover { background:var(--gold-light)!important; }
+
+/* ── HERO ── */
+.hero { height:100vh; display:flex; align-items:center; justify-content:center; position:relative; overflow:hidden; }
+.hero-bg { position:absolute; inset:0; background:radial-gradient(ellipse at 30% 50%, #3D1800, #1A0F00 65%); }
+.hero-grain { position:absolute; inset:0; opacity:0.05; background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); background-size:200px; }
+
+.ring { position:absolute; border-radius:50%; border:1px solid rgba(200,150,62,0.13); top:50%; left:50%; transform:translate(-50%,-50%); }
+.r1 { width:500px; height:500px; }
+.r2 { width:680px; height:680px; border-color:rgba(200,150,62,0.07); }
+.r3 { width:870px; height:870px; border-color:rgba(200,150,62,0.04); }
+
+.hero-content { position:relative; text-align:center; z-index:2; }
+
+.hero-eyebrow { font-family:'DM Mono',monospace; font-size:0.65rem; letter-spacing:0.45em; text-transform:uppercase; color:var(--gold); margin-bottom:2rem; display:block; opacity:0; transform:translateY(20px); }
+.hero-title { font-size:clamp(5rem,12vw,11rem); font-weight:300; line-height:0.88; letter-spacing:-0.02em; color:var(--cream); opacity:0; transform:translateY(80px); }
+.hero-title em { font-style:italic; color:var(--gold-light); }
+.hero-sub { font-size:1.15rem; font-weight:300; color:var(--muted); margin-top:2rem; letter-spacing:0.06em; opacity:0; transform:translateY(20px); }
+.hero-cta { margin-top:4rem; display:flex; gap:2rem; justify-content:center; opacity:0; transform:translateY(20px); }
+
+.btn-gold { padding:1rem 3rem; background:var(--gold); color:var(--espresso); border:none; font-family:'DM Mono',monospace; font-size:0.7rem; letter-spacing:0.2em; text-transform:uppercase; cursor:none; text-decoration:none; display:inline-block; transition:background 0.3s, transform 0.3s; }
+.btn-gold:hover { background:var(--gold-light); transform:translateY(-3px); }
+.btn-outline { padding:1rem 3rem; background:transparent; color:var(--cream); border:1px solid rgba(245,239,224,0.3); font-family:'DM Mono',monospace; font-size:0.7rem; letter-spacing:0.2em; text-transform:uppercase; cursor:none; text-decoration:none; display:inline-block; transition:border-color 0.3s, transform 0.3s; }
+.btn-outline:hover { border-color:var(--gold); transform:translateY(-3px); }
+
+/* steam */
+.steam-wrap { position:absolute; bottom:14%; left:50%; transform:translateX(-50%); display:flex; gap:14px; }
+.stm { width:2px; border-radius:2px; background:linear-gradient(to top,var(--gold),transparent); animation:stm 3s ease-in-out infinite; }
+.stm:nth-child(1){ height:55px; animation-delay:0s; }
+.stm:nth-child(2){ height:40px; animation-delay:0.6s; }
+.stm:nth-child(3){ height:70px; animation-delay:1.1s; }
+@keyframes stm { 0%,100%{transform:scaleY(1) translateY(0);opacity:0.35;} 50%{transform:scaleY(1.2) translateY(-10px);opacity:0.7;} }
+
+/* scroll hint */
+.scroll-hint { position:absolute; bottom:3.5rem; left:50%; transform:translateX(-50%); display:flex; flex-direction:column; align-items:center; gap:0.5rem; opacity:0; }
+.scroll-hint span { font-family:'DM Mono',monospace; font-size:0.6rem; letter-spacing:0.35em; text-transform:uppercase; color:var(--muted); }
+.scroll-line { width:1px; height:50px; background:linear-gradient(to bottom,var(--gold),transparent); animation:sline 2s ease-in-out infinite; }
+@keyframes sline { 0%{transform:scaleY(0);transform-origin:top;} 50%{transform:scaleY(1);transform-origin:top;} 51%{transform:scaleY(1);transform-origin:bottom;} 100%{transform:scaleY(0);transform-origin:bottom;} }
+
+/* ── ABOUT ── */
+.about { padding:14rem 4rem; max-width:1400px; margin:0 auto; display:grid; grid-template-columns:1fr 1fr; gap:8rem; align-items:center; }
+.about-label { font-family:'DM Mono',monospace; font-size:0.65rem; letter-spacing:0.4em; text-transform:uppercase; color:var(--gold); margin-bottom:2rem; display:block; }
+.about-title { font-size:clamp(2.8rem,5vw,5rem); font-weight:300; line-height:1.1; }
+.about-title em { font-style:italic; color:var(--gold-light); }
+.about-text { font-size:1.1rem; line-height:1.9; color:var(--muted); font-weight:300; margin-top:1.5rem; }
+.about-visual { position:relative; height:550px; }
+.about-card { position:absolute; background:linear-gradient(135deg,#2A1500,#1A0F00); border:1px solid rgba(200,150,62,0.18); padding:3rem; }
+.about-card-1 { top:0; right:0; width:75%; height:60%; }
+.about-card-2 { bottom:0; left:0; width:55%; height:42%; }
+.stat-num { font-size:5rem; font-weight:300; color:var(--gold); line-height:1; }
+.stat-label { font-family:'DM Mono',monospace; font-size:0.6rem; letter-spacing:0.2em; color:var(--muted); text-transform:uppercase; margin-top:0.4rem; }
+
+/* ── MENU ── */
+.menu-section { padding:8rem 4rem; background:#110800; position:relative; }
+.menu-section::before { content:''; position:absolute; top:0; left:0; right:0; height:1px; background:linear-gradient(90deg,transparent,var(--gold),transparent); }
+.section-header { text-align:center; margin-bottom:7rem; }
+.section-label { font-family:'DM Mono',monospace; font-size:0.65rem; letter-spacing:0.4em; text-transform:uppercase; color:var(--gold); margin-bottom:1.5rem; display:block; }
+.section-title { font-size:clamp(3rem,6vw,6rem); font-weight:300; line-height:1; }
+.section-title em { font-style:italic; color:var(--gold-light); }
+.menu-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:2px; max-width:1200px; margin:0 auto; }
+.menu-item { padding:3.5rem 2.8rem; border:1px solid rgba(200,150,62,0.1); background:var(--espresso); position:relative; overflow:hidden; cursor:none; transition:background 0.4s; }
+.menu-item::after { content:''; position:absolute; bottom:0; left:0; right:0; height:2px; background:var(--gold); transform:scaleX(0); transform-origin:left; transition:transform 0.4s; }
+.menu-item:hover { background:#1f1000; }
+.menu-item:hover::after { transform:scaleX(1); }
+.menu-num { font-family:'DM Mono',monospace; font-size:0.6rem; color:var(--gold); letter-spacing:0.3em; margin-bottom:1.8rem; opacity:0.5; }
+.menu-icon { font-size:2.2rem; margin-bottom:1.2rem; display:block; }
+.menu-name { font-size:1.9rem; font-weight:300; color:var(--cream); margin-bottom:0.8rem; line-height:1.2; transition:transform 0.3s; }
+.menu-item:hover .menu-name { transform:translateX(6px); }
+.menu-desc { font-size:0.95rem; color:var(--muted); line-height:1.8; font-weight:300; }
+.menu-price { margin-top:1.8rem; font-family:'DM Mono',monospace; font-size:0.85rem; color:var(--gold); letter-spacing:0.1em; }
+
+/* ── PROCESS ── */
+.process-section { padding:10rem 4rem; max-width:1300px; margin:0 auto; }
+.process-steps { margin-top:7rem; display:grid; grid-template-columns:repeat(4,1fr); gap:3rem; position:relative; }
+.process-line { position:absolute; top:0.35rem; left:0.35rem; right:0.35rem; height:1px; background:rgba(200,150,62,0.25); transform-origin:left; }
+.process-line-fill { position:absolute; top:0.35rem; left:0.35rem; right:0.35rem; height:1px; background:linear-gradient(90deg,var(--gold),rgba(200,150,62,0.4)); transform:scaleX(0); transform-origin:left; }
+.process-step { position:relative; }
+.process-dot { width:9px; height:9px; border-radius:50%; background:var(--gold); margin-bottom:3rem; position:relative; z-index:2; box-shadow:0 0 18px rgba(200,150,62,0.5); }
+.process-step-num { font-family:'DM Mono',monospace; font-size:0.6rem; color:var(--gold); letter-spacing:0.3em; margin-bottom:1.2rem; opacity:0.55; }
+.process-step-title { font-size:1.7rem; font-weight:300; color:var(--cream); margin-bottom:0.8rem; }
+.process-step-desc { font-size:0.9rem; color:var(--muted); line-height:1.8; font-weight:300; }
+
+/* ── TESTIMONIAL ── */
+.testi { background:#0C0500; padding:12rem 4rem; text-align:center; position:relative; overflow:hidden; }
+.testi::before { content:''; position:absolute; top:-300px; left:50%; transform:translateX(-50%); width:900px; height:900px; border-radius:50%; border:1px solid rgba(200,150,62,0.05); }
+.quote-mark { font-size:12rem; color:var(--gold); opacity:0.07; line-height:1; font-family:Georgia,serif; margin-bottom:-5rem; display:block; }
+.testi-quote { font-size:clamp(1.8rem,3.5vw,3.2rem); font-weight:300; font-style:italic; line-height:1.45; color:var(--cream); max-width:900px; margin:0 auto; position:relative; z-index:2; }
+.testi-author { margin-top:3rem; font-family:'DM Mono',monospace; font-size:0.65rem; letter-spacing:0.3em; text-transform:uppercase; color:var(--gold); position:relative; z-index:2; }
+
+/* ── FOOTER ── */
+footer { padding:6rem 4rem; border-top:1px solid rgba(200,150,62,0.15); display:flex; justify-content:space-between; align-items:flex-end; }
+.footer-logo { font-size:3rem; font-weight:300; letter-spacing:0.4em; color:var(--gold-light); opacity:0.5; text-transform:uppercase; }
+.footer-info { font-family:'DM Mono',monospace; font-size:0.65rem; letter-spacing:0.15em; color:var(--muted); text-align:right; line-height:2.4; }
+.footer-info .by-yosh { color:var(--gold); letter-spacing:0.2em; }
+
+/* ── PARTICLES ── */
+.particle { position:fixed; width:3px; height:3px; border-radius:50%; background:var(--gold); pointer-events:none; opacity:0; z-index:50; }
+
+/* ── LIVE INDICATOR ── */
+#live-widget {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  z-index: 500;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  align-items: flex-end;
+}
+.live-card {
+  background: rgba(26,15,0,0.92);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(200,150,62,0.25);
+  padding: 0.7rem 1.1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  min-width: 180px;
+}
+.live-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: #4ade80;
+  box-shadow: 0 0 8px #4ade80;
+  flex-shrink: 0;
+  animation: pulse-dot 1.8s ease-in-out infinite;
+}
+.live-dot.total-dot { background: var(--gold); box-shadow: 0 0 8px var(--gold); animation: none; }
+@keyframes pulse-dot {
+  0%,100% { box-shadow: 0 0 6px #4ade80; transform: scale(1); }
+  50%      { box-shadow: 0 0 18px #4ade80, 0 0 30px rgba(74,222,128,0.3); transform: scale(1.25); }
+}
+.live-text { display: flex; flex-direction: column; }
+.live-label { font-family:'DM Mono',monospace; font-size:0.55rem; letter-spacing:0.2em; text-transform:uppercase; color:var(--muted); }
+.live-count { font-family:'Cormorant Garamond',serif; font-size:1.4rem; font-weight:300; color:var(--cream); line-height:1; }
+.live-count span { color:var(--gold-light); }
+.live-status {
+  display: flex; align-items: center; gap: 0.4rem;
+  font-family:'DM Mono',monospace; font-size:0.55rem; letter-spacing:0.15em;
+  text-transform:uppercase; color:#4ade80; padding: 0.3rem 0.8rem;
+  background: rgba(74,222,128,0.08); border: 1px solid rgba(74,222,128,0.2);
+  margin-bottom: 0.2rem;
+}
+.live-status-dot { width:5px; height:5px; border-radius:50%; background:#4ade80; animation: pulse-dot 1.8s ease-in-out infinite; }
+
+/* ── LOADING SCREEN ── */
+#loader { position:fixed; inset:0; background:var(--espresso); z-index:1000; display:flex; align-items:center; justify-content:center; flex-direction:column; gap:2rem; }
+#loader-logo { font-size:4rem; font-weight:300; letter-spacing:0.5em; text-transform:uppercase; color:var(--gold-light); opacity:0; }
+#loader-bar-wrap { width:200px; height:1px; background:rgba(200,150,62,0.2); }
+#loader-bar { height:100%; width:0%; background:var(--gold); }
+
+@media(max-width:768px){
+  nav { padding:1.5rem 2rem; }
+  .about { grid-template-columns:1fr; padding:6rem 2rem; gap:4rem; }
+  .about-visual { height:400px; }
+  .menu-grid { grid-template-columns:1fr; }
+  .process-steps { grid-template-columns:1fr 1fr; }
+  .process-line,.process-line-fill { display:none; }
+  footer { flex-direction:column; gap:2rem; }
+  .footer-info { text-align:left; }
+}
+</style>
+</head>
+<body>
+
+<!-- LOADER -->
+<div id="loader">
+  <div id="loader-logo">YOSHbrew</div>
+  <div id="loader-bar-wrap"><div id="loader-bar"></div></div>
+</div>
+
+<!-- CURSOR -->
+<div id="cur"></div>
+<div id="cur-ring"></div>
+
+<!-- NAV -->
+<nav id="nav">
+  <a href="#" class="nav-logo">YOSHbrew</a>
+  <ul class="nav-links">
+    <li><a href="#menu">Menu</a></li>
+    <li><a href="#process">Proseso</a></li>
+    <li><a href="#about">Kwento</a></li>
+    <li><a href="#" class="nav-btn">Puntahan Mo Kami</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section class="hero" id="home">
+  <div class="hero-bg"></div>
+  <div class="hero-grain"></div>
+  <div class="ring r1"></div>
+  <div class="ring r2"></div>
+  <div class="ring r3"></div>
+
+  <div class="hero-content">
+    <span class="hero-eyebrow">Est. 2026 · Espesyal na Kape · Para sa Mga Lodi</span>
+    <h1 class="hero-title">Ang Arte<br>ng <em>Yosh</em><br>Brew</h1>
+    <p class="hero-sub">Kape na pang-sosyal, presyo na hindi makakasakit ng puso. 🤌</p>
+    <div class="hero-cta">
+      <a href="#menu" class="btn-gold">Tingnan ang Menu</a>
+      <a href="#process" class="btn-outline">Paano Namin Ginagawa</a>
+    </div>
+  </div>
+
+  <div class="steam-wrap">
+    <div class="stm"></div>
+    <div class="stm"></div>
+    <div class="stm"></div>
+  </div>
+
+  <div class="scroll-hint" id="scrollHint">
+    <span>Mag-scroll na</span>
+    <div class="scroll-line"></div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section class="about" id="about">
+  <div class="about-left">
+    <span class="about-label">Ang Aming Pilosopiya (Chareng Malalim 😤)</span>
+    <h2 class="about-title">Kape hindi<br><em>basta-basta,</em><br>lodi.</h2>
+    <p class="about-text">Sa YOSHbrew, naniniwala kaming ang bawat butil ng kape ay may kwento — ng lupa, ng araw, at ng mga kamay na maingat na nag-alaga nito. Hindi kami basta nagpapalit ng tubig at kape ha. Seryoso kami dito.</p>
+    <p class="about-text">Bawat tasa ay ginawa nang may pagmamahal at konting drama. Ang aming mga barista ay nagsanay ng ilang taon, hindi lang ilang araw — kaya wag mong ihambing sa 3-in-1 mo sa bahay. 😅</p>
+  </div>
+  <div class="about-visual">
+    <div class="about-card about-card-1">
+      <div class="stat-num" id="c1">0</div>
+      <p class="stat-label">Farms na pinagkukunan namin (legit, hindi daan-daan)</p>
+      <div style="margin-top:2.5rem;">
+        <div class="stat-num" id="c2" style="font-size:3.5rem;">0</div>
+        <p class="stat-label">Tasang naibenta na namin, grabe 'no?</p>
+      </div>
+    </div>
+    <div class="about-card about-card-2">
+      <div class="stat-num" id="c3" style="font-size:3.5rem;">0</div>
+      <p class="stat-label">Taon na kaming nagte-try maging legit na coffee shop</p>
+    </div>
+  </div>
+</section>
+
+<!-- MENU -->
+<section class="menu-section" id="menu">
+  <div class="section-header">
+    <span class="section-label">Heto Na ang Pinaghandaan Namin (Tangkilikin Mo Naman)</span>
+    <h2 class="section-title">Ang <em>Menu</em> 👇</h2>
+  </div>
+  <div class="menu-grid" id="menuGrid">
+    <div class="menu-item">
+      <p class="menu-num">01</p><span class="menu-icon">☕</span>
+      <h3 class="menu-name">Yosh Espresso</h3>
+      <p class="menu-desc">Double shot mula sa Ethiopian Yirgacheffe. Mapait pero malansa ang peg — katulad ng ex mo na hindi mo pa rin makalimutan. 💀</p>
+      <p class="menu-price">₱ 290</p>
+    </div>
+    <div class="menu-item">
+      <p class="menu-num">02</p><span class="menu-icon">🫗</span>
+      <h3 class="menu-name">Yosh Cortado</h3>
+      <p class="menu-desc">Espresso at gatas na magkasamang nagmahal. Hindi magulo, hindi OA — tamang-tama lang. Parang ideal na relasyon. (Meron ba niyan?) 🥹</p>
+      <p class="menu-price">₱ 340</p>
+    </div>
+    <div class="menu-item">
+      <p class="menu-num">03</p><span class="menu-icon">🧊</span>
+      <h3 class="menu-name">Cold Immersion</h3>
+      <p class="menu-desc">24 oras na binabad sa malamig na tubig. Katulad ng aming pag-asa sa buhay — matagal, masakit, pero worth it naman sa huli. 😂</p>
+      <p class="menu-price">₱ 370</p>
+    </div>
+    <div class="menu-item">
+      <p class="menu-num">04</p><span class="menu-icon">🍵</span>
+      <h3 class="menu-name">Siphon Pour</h3>
+      <p class="menu-desc">Kenyan AA, gawa sa vacuum siphon na parang nasa lab ka. Mukhang sosyal, masustansya, at mahal — pero okay lang, bihasa ka naman mag-utang. 😭</p>
+      <p class="menu-price">₱ 480</p>
+    </div>
+    <div class="menu-item">
+      <p class="menu-num">05</p><span class="menu-icon">🌿</span>
+      <h3 class="menu-name">Ceremonial Matcha</h3>
+      <p class="menu-desc">Grade A matcha mula Uji, Japan. Para sa mga nagpapanggap na hindi sila coffee drinker pero lagi silang nasa coffee shop. Kilala kita, lodi. 👁️</p>
+      <p class="menu-price">₱ 395</p>
+    </div>
+    <div class="menu-item">
+      <p class="menu-num">06</p><span class="menu-icon">✨</span>
+      <h3 class="menu-name">Signature Blend</h3>
+      <p class="menu-desc">Sekreto ng bahay — palaging nagbabago depende sa mood namin. Tanungin mo si kuya barista, baka ayaw pang sabihin kasi nagtatampo. ✌️</p>
+      <p class="menu-price">₱ 420</p>
+    </div>
+  </div>
+</section>
+
+<!-- PROCESS -->
+<section class="process-section" id="process">
+  <div class="section-header">
+    <span class="section-label">Paano Namin Ginagawa (Hindi Biro Ito Ha)</span>
+    <h2 class="section-title">Ang <em>Proseso</em></h2>
+  </div>
+  <div class="process-steps" id="processSteps">
+    <div class="process-line" id="pLine"></div>
+    <div class="process-line-fill" id="pFill"></div>
+    <div class="process-step">
+      <div class="process-dot"></div>
+      <p class="process-step-num">01 — Kuhanin</p>
+      <h3 class="process-step-title">Direkta sa Bukid</h3>
+      <p class="process-step-desc">Personal kaming pumupunta sa bawat farm. Hindi lang basta order sa Shopee, ha. Nagbabakasyon kami para sa inyo. Sana mahalin niyo kaming pabalik. 🙏</p>
+    </div>
+    <div class="process-step">
+      <div class="process-dot"></div>
+      <p class="process-step-num">02 — I-roast</p>
+      <h3 class="process-step-title">Dahan-dahang Inihaw</h3>
+      <p class="process-step-desc">Small batch roasting sa aming drum roaster. Pinagtyatyagaan namin ito nang matagal — hindi katulad ng mga nagmamadaling umibig. Alam ninyo kung sino kayo. 😶</p>
+    </div>
+    <div class="process-step">
+      <div class="process-dot"></div>
+      <p class="process-step-num">03 — Pahinga</p>
+      <h3 class="process-step-title">72 Oras na Pahinga</h3>
+      <p class="process-step-desc">Pagkatapos i-roast, pinahahinga namin ng 72 oras. Katulad ng tao na kailangan ng space — respetuhin natin, okay? Hindi agad-agad. 🧘</p>
+    </div>
+    <div class="process-step">
+      <div class="process-dot" style="background:var(--gold-light);box-shadow:0 0 20px rgba(232,188,106,0.5);"></div>
+      <p class="process-step-num">04 — Ihain</p>
+      <h3 class="process-step-title">May Pagmamahal</h3>
+      <p class="process-step-desc">Bawat tasa, ginagawa ng aming barista nang buong puso. Kung hindi masarap? Sabihin mo agad — hindi kami nagtatampo. Baka. Depende. 😬</p>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIAL -->
+<div class="testi">
+  <span class="quote-mark">"</span>
+  <blockquote class="testi-quote" id="testiQ">"Uminom ako ng isang tasa ng YOSHbrew tapos naiyak ako — hindi dahil masama. Dahil masyadong masarap at hindi ko deserve. Babalik ako bukas at sa makalawa."</blockquote>
+  <p class="testi-author" id="testiA">— Ate Karen G., Suki simula pa nung first month namin 🥲</p>
+</div>
+
+<!-- LIVE VISITOR WIDGET -->
+<div id="live-widget">
+  <div class="live-status">
+    <div class="live-status-dot"></div>
+    LIVE
+  </div>
+  <div class="live-card">
+    <div class="live-dot"></div>
+    <div class="live-text">
+      <span class="live-label">Online ngayon</span>
+      <div class="live-count"><span id="liveOnline">—</span> tao</div>
+    </div>
+  </div>
+  <div class="live-card">
+    <div class="live-dot total-dot"></div>
+    <div class="live-text">
+      <span class="live-label">Kabuuang bisita</span>
+      <div class="live-count"><span id="liveTotal">—</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">YOSHbrew</div>
+  <div class="footer-info">
+    47 Golden Lane, Merchant Quarter<br>
+    Bukas Araw-araw · 7am — 9pm (Pag late ka, lagot ka) 😤<br>
+    hello@yoshbrew.co<br><br>
+    © 2026 YOSHbrew Coffee House · Lahat ng Karapatan Nakalaan<br>
+    <span class="by-yosh">Ginawa nang may pagmamahal ni Yosh ♥</span>
+  </div>
+</footer>
+
+<!-- GSAP via CDN with integrity fallback -->
+<script>
+// Load GSAP dynamically and start animations once ready
+function loadScript(src, cb) {
+  const s = document.createElement('script');
+  s.src = src;
+  s.onload = cb;
+  s.onerror = () => { console.warn('GSAP CDN failed, using CSS fallback'); useCSSFallback(); };
+  document.head.appendChild(s);
+}
+
+loadScript('https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js', () => {
+  loadScript('https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js', initGSAP);
+});
+
+// ─── GSAP ANIMATIONS ───────────────────────────────────────────
+function initGSAP() {
+  gsap.registerPlugin(ScrollTrigger);
+
+  // ── LOADER ──
+  const loaderTL = gsap.timeline({
+    onComplete: () => {
+      gsap.to('#loader', { opacity:0, duration:0.6, onComplete: () => document.getElementById('loader').remove() });
+      heroEntrance();
+    }
+  });
+  loaderTL
+    .to('#loader-logo', { opacity:1, y:0, duration:0.8, ease:'power3.out', from:{y:30} })
+    .to('#loader-bar', { width:'100%', duration:1.4, ease:'power2.inOut' }, '-=0.4')
+    .to('#loader-logo', { opacity:0, y:-20, duration:0.5, ease:'power2.in' }, '+=0.2')
+    .to('#loader-bar', { opacity:0, duration:0.3 }, '<');
+
+  // ── HERO ENTRANCE ──
+  function heroEntrance() {
+    const tl = gsap.timeline();
+    tl
+      .to('.hero-eyebrow', { opacity:1, y:0, duration:1, ease:'power3.out' })
+      .to('.hero-title',   { opacity:1, y:0, duration:1.4, ease:'power4.out' }, '-=0.5')
+      .to('.hero-sub',     { opacity:1, y:0, duration:1,   ease:'power3.out' }, '-=0.7')
+      .to('.hero-cta',     { opacity:1, y:0, duration:1,   ease:'power3.out' }, '-=0.6')
+      .to('#scrollHint',   { opacity:0.7,    duration:1,   ease:'power3.out' }, '-=0.3');
+  }
+
+  // ── RING PULSE ──
+  gsap.to('.r1', { scale:1.06, duration:4, repeat:-1, yoyo:true, ease:'sine.inOut' });
+  gsap.to('.r2', { scale:1.04, duration:6, repeat:-1, yoyo:true, ease:'sine.inOut', delay:1 });
+  gsap.to('.r3', { scale:1.02, duration:8, repeat:-1, yoyo:true, ease:'sine.inOut', delay:2 });
+
+  // ── FLOATING RING ROTATION ──
+  gsap.to('.r1', { rotation:360, duration:40, repeat:-1, ease:'none' });
+  gsap.to('.r2', { rotation:-360, duration:60, repeat:-1, ease:'none' });
+
+  // ── NAV SCROLL ──
+  ScrollTrigger.create({
+    start:'top -60',
+    onUpdate(self) {
+      gsap.to('nav', {
+        backgroundColor: self.progress > 0 ? 'rgba(26,15,0,0.92)' : 'rgba(0,0,0,0)',
+        backdropFilter: self.progress > 0 ? 'blur(14px)' : 'blur(0px)',
+        duration:0.4
+      });
+    }
+  });
+
+  // ── HERO PARALLAX ──
+  gsap.to('.hero-content', {
+    scrollTrigger:{ trigger:'.hero', start:'top top', end:'bottom top', scrub:1 },
+    y:120, opacity:0
+  });
+
+  // ── ABOUT LEFT ──
+  gsap.from('.about-left > *', {
+    scrollTrigger:{ trigger:'.about', start:'top 72%' },
+    opacity:0, y:60, stagger:0.18, duration:1.2, ease:'power3.out'
+  });
+
+  // ── ABOUT CARDS ──
+  gsap.from('.about-card-1', {
+    scrollTrigger:{ trigger:'.about-visual', start:'top 75%' },
+    opacity:0, x:80, rotation:3, duration:1.2, ease:'power3.out'
+  });
+  gsap.from('.about-card-2', {
+    scrollTrigger:{ trigger:'.about-visual', start:'top 75%' },
+    opacity:0, x:-60, rotation:-2, duration:1.3, delay:0.2, ease:'power3.out'
+  });
+
+  // ── COUNTERS ──
+  function counter(id, target, suffix='') {
+    const el = document.getElementById(id);
+    ScrollTrigger.create({
+      trigger:el, start:'top 80%',
+      onEnter:() => gsap.to({v:0},{
+        v:target, duration:2, ease:'power2.out',
+        onUpdate(){ el.textContent = Math.round(this.targets()[0].v).toLocaleString() + suffix; }
+      })
+    });
+  }
+  counter('c1', 42);
+  counter('c2', 85000, '+');
+  counter('c3', 5);
+
+  // ── MENU ITEMS — dramatic stagger ──
+  gsap.from('.menu-item', {
+    scrollTrigger:{ trigger:'#menuGrid', start:'top 78%' },
+    opacity:0, y:80, rotationX:15, stagger:{ amount:0.9, from:'start' },
+    duration:1, ease:'power3.out', transformOrigin:'top center'
+  });
+
+  // ── PROCESS LINE ──
+  gsap.to('#pFill', {
+    scrollTrigger:{ trigger:'#processSteps', start:'top 70%', end:'bottom 60%', scrub:1 },
+    scaleX:1, ease:'none'
+  });
+
+  // ── PROCESS STEPS ──
+  gsap.from('.process-step', {
+    scrollTrigger:{ trigger:'#processSteps', start:'top 75%' },
+    opacity:0, y:50, stagger:0.25, duration:1.1, ease:'power3.out'
+  });
+
+  // ── PROCESS DOTS GLOW ──
+  gsap.to('.process-dot', {
+    boxShadow:'0 0 35px rgba(200,150,62,0.9)',
+    duration:1.5, repeat:-1, yoyo:true, ease:'sine.inOut',
+    stagger:{ each:0.4, from:'start' }
+  });
+
+  // ── TESTIMONIAL ──
+  gsap.from('#testiQ', {
+    scrollTrigger:{ trigger:'#testiQ', start:'top 82%' },
+    opacity:0, y:50, duration:1.5, ease:'power3.out'
+  });
+  gsap.from('#testiA', {
+    scrollTrigger:{ trigger:'#testiA', start:'top 88%' },
+    opacity:0, y:20, duration:1, delay:0.4, ease:'power3.out'
+  });
+
+  // ── SECTION HEADERS ──
+  document.querySelectorAll('.section-header').forEach(h => {
+    gsap.from(h.children, {
+      scrollTrigger:{ trigger:h, start:'top 80%' },
+      opacity:0, y:40, stagger:0.15, duration:1, ease:'power3.out'
+    });
+  });
+
+  // ── FOOTER ──
+  gsap.from('footer > *', {
+    scrollTrigger:{ trigger:'footer', start:'top 85%' },
+    opacity:0, y:30, stagger:0.2, duration:1, ease:'power3.out'
+  });
+
+  // ── CUSTOM CURSOR ──
+  const cur = document.getElementById('cur');
+  const ring = document.getElementById('cur-ring');
+  let mx=0, my=0, rx=0, ry=0;
+  document.addEventListener('mousemove', e => {
+    mx = e.clientX; my = e.clientY;
+    gsap.to(cur, { x:mx, y:my, duration:0.08 });
+  });
+  (function tickRing(){
+    rx += (mx-rx)*0.1; ry += (my-ry)*0.1;
+    gsap.set(ring, { x:rx, y:ry });
+    requestAnimationFrame(tickRing);
+  })();
+
+  document.querySelectorAll('a, button, .menu-item').forEach(el => {
+    el.addEventListener('mouseenter', () => {
+      gsap.to(cur,  { scale:0.4, duration:0.3 });
+      gsap.to(ring, { scale:1.8, borderColor:'rgba(200,150,62,0.9)', duration:0.3 });
+    });
+    el.addEventListener('mouseleave', () => {
+      gsap.to(cur,  { scale:1,   duration:0.3 });
+      gsap.to(ring, { scale:1,   borderColor:'rgba(200,150,62,1)',   duration:0.3 });
+    });
+  });
+
+  // ── CLICK BURST PARTICLES ──
+  document.addEventListener('click', e => {
+    for(let i=0;i<10;i++){
+      const p = document.createElement('div');
+      p.className = 'particle';
+      document.body.appendChild(p);
+      const angle = (i/10)*Math.PI*2;
+      const dist  = 40+Math.random()*60;
+      gsap.set(p,  { x:e.clientX, y:e.clientY });
+      gsap.to(p, {
+        x: e.clientX + Math.cos(angle)*dist,
+        y: e.clientY + Math.sin(angle)*dist,
+        opacity:0.9, scale:1, duration:0.1,
+        onComplete:() => gsap.to(p,{ opacity:0, scale:0, duration:0.5, onComplete:()=>p.remove() })
+      });
+    }
+  });
+
+  // ── MAGNETIC HOVER on CTA btns ──
+  document.querySelectorAll('.btn-gold, .btn-outline, .nav-btn').forEach(btn => {
+    btn.addEventListener('mousemove', e => {
+      const r = btn.getBoundingClientRect();
+      const dx = e.clientX - (r.left + r.width/2);
+      const dy = e.clientY - (r.top + r.height/2);
+      gsap.to(btn, { x:dx*0.25, y:dy*0.25, duration:0.4, ease:'power2.out' });
+    });
+    btn.addEventListener('mouseleave', () => {
+      gsap.to(btn, { x:0, y:0, duration:0.5, ease:'elastic.out(1,0.4)' });
+    });
+  });
+}
+
+// ─── LIVE VISITOR WEBSOCKET CLIENT ─────────────────────────────
+(function() {
+  const onlineEl = document.getElementById('liveOnline');
+  const totalEl  = document.getElementById('liveTotal');
+  const widget   = document.getElementById('live-widget');
+
+  // Auto-detect: use ws:// or wss:// based on page protocol
+  const proto = location.protocol === 'https:' ? 'wss' : 'ws';
+  const wsUrl = `${proto}://${location.host}`;
+
+  let ws, reconnectTimer;
+
+  function animateCount(el, newVal) {
+    const current = parseInt(el.textContent) || 0;
+    if (current === newVal) return;
+    // Quick number flip animation
+    el.style.transform = 'translateY(-8px)';
+    el.style.opacity = '0';
+    el.style.transition = 'transform 0.2s ease, opacity 0.2s ease';
+    setTimeout(() => {
+      el.textContent = newVal.toLocaleString();
+      el.style.transform = 'translateY(8px)';
+      setTimeout(() => {
+        el.style.transform = 'translateY(0)';
+        el.style.opacity = '1';
+      }, 50);
+    }, 200);
+  }
+
+  function connect() {
+    try {
+      ws = new WebSocket(wsUrl);
+    } catch(e) {
+      // Not running on server — show demo mode
+      showDemo();
+      return;
+    }
+
+    ws.onopen = () => {
+      console.log('[YOSHbrew] WebSocket connected ✅');
+      clearTimeout(reconnectTimer);
+      widget.style.opacity = '1';
+    };
+
+    ws.onmessage = (e) => {
+      try {
+        const data = JSON.parse(e.data);
+        if (data.type === 'stats') {
+          animateCount(onlineEl, data.online);
+          animateCount(totalEl,  data.total);
+        }
+      } catch(err) {}
+    };
+
+    ws.onclose = () => {
+      console.log('[YOSHbrew] WebSocket closed, reconnecting in 3s...');
+      reconnectTimer = setTimeout(connect, 3000);
+    };
+
+    ws.onerror = () => {
+      ws.close();
+      showDemo();
+    };
+  }
+
+  // Fallback demo mode when opened as a local file (not on server)
+  function showDemo() {
+    console.warn('[YOSHbrew] Not connected to server — showing demo mode');
+    onlineEl.textContent = '1';
+    totalEl.textContent  = '1';
+    widget.style.opacity = '1';
+    widget.title = 'Demo mode — deploy to server for live data!';
+  }
+
+  // Start connection
+  connect();
+
+  // Cleanup on page unload
+  window.addEventListener('beforeunload', () => { if(ws) ws.close(); });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,15 @@
+{
+  "name": "yoshbrew",
+  "version": "1.0.0",
+  "description": "YOSHbrew Coffee Shop Website with Real-Time Visitor Tracker",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "dependencies": {
+    "ws": "^8.17.1"
+  },
+  "author": "Yosh",
+  "license": "ISC"
+}
