@@ -2,38 +2,572 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>YOSHbrew — Specialty Coffee</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
 <style>
-*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+:root { --cream:#F5EFE0; --espresso:#1A0F00; --gold:#C8963E; --gold-light:#E8BC6A; --muted:#8B7355; }
+html { scroll-behavior:smooth; }
+body { background:var(--espresso); color:var(--cream); font-family:'Cormorant Garamond',serif; overflow-x:hidden; }
 
-:root {
-  --cream: #F5EFE0;
-  --espresso: #1A0F00;
-  --gold: #C8963E;
-  --gold-light: #E8BC6A;
-  --muted: #8B7355;
+/* CURSOR — desktop only */
+#cur,#cur-ring { display:none; }
+@media(hover:hover) and (pointer:fine){
+  body { cursor:none; }
+  #cur { display:block; position:fixed; width:12px; height:12px; background:var(--gold); border-radius:50%; pointer-events:none; z-index:9999; top:0; left:0; transform:translate(-50%,-50%); }
+  #cur-ring { display:block; position:fixed; width:44px; height:44px; border:1px solid var(--gold); border-radius:50%; pointer-events:none; z-index:9998; top:0; left:0; transform:translate(-50%,-50%); }
 }
 
-html { scroll-behavior: smooth; }
+/* NAV */
+nav { position:fixed; top:0; left:0; right:0; z-index:200; padding:1.5rem 2rem; display:flex; justify-content:space-between; align-items:center; transition:background 0.4s; }
+.nav-logo { font-size:1.4rem; font-weight:300; letter-spacing:0.35em; color:var(--gold-light); text-transform:uppercase; text-decoration:none; }
+.nav-links { display:flex; gap:1.5rem; list-style:none; align-items:center; }
+.nav-links a { color:var(--cream); text-decoration:none; font-family:'DM Mono',monospace; font-size:0.65rem; letter-spacing:0.2em; text-transform:uppercase; opacity:0.7; transition:opacity 0.3s,color 0.3s; }
+.nav-links a:hover { opacity:1; color:var(--gold-light); }
+.nav-btn { padding:0.55rem 1.2rem; background:var(--gold); color:var(--espresso)!important; opacity:1!important; font-family:'DM Mono',monospace; font-size:0.6rem!important; letter-spacing:0.15em; text-transform:uppercase; text-decoration:none; transition:background 0.3s!important; white-space:nowrap; }
+.nav-btn:hover { background:var(--gold-light)!important; }
 
-body {
-  background: var(--espresso);
-  color: var(--cream);
-  font-family: 'Cormorant Garamond', serif;
-  overflow-x: hidden;
-  cursor: none;
+/* HAMBURGER */
+.hamburger { display:none; flex-direction:column; gap:5px; cursor:pointer; padding:4px; background:none; border:none; }
+.hamburger span { display:block; width:24px; height:1px; background:var(--cream); transition:all 0.3s; }
+
+/* MOBILE DRAWER */
+.mobile-nav { display:none; position:fixed; inset:0; background:rgba(26,15,0,0.98); z-index:300; flex-direction:column; align-items:center; justify-content:center; gap:2.5rem; }
+.mobile-nav.open { display:flex; }
+.mobile-nav a { font-family:'DM Mono',monospace; font-size:1rem; letter-spacing:0.3em; text-transform:uppercase; color:var(--cream); text-decoration:none; opacity:0.7; }
+.mobile-nav a:hover { opacity:1; color:var(--gold-light); }
+.mobile-nav .nav-btn { opacity:1!important; font-size:0.8rem!important; padding:0.8rem 2rem; }
+.mobile-close { position:absolute; top:2rem; right:2rem; background:none; border:none; color:var(--muted); font-size:1.5rem; cursor:pointer; font-family:sans-serif; }
+
+/* HERO */
+.hero { height:100svh; min-height:600px; display:flex; align-items:center; justify-content:center; position:relative; overflow:hidden; padding:2rem 1.5rem; }
+.hero-bg { position:absolute; inset:0; background:radial-gradient(ellipse at 30% 50%,#3D1800,#1A0F00 65%); }
+.hero-grain { position:absolute; inset:0; opacity:0.05; background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); background-size:200px; }
+.ring { position:absolute; border-radius:50%; border:1px solid rgba(200,150,62,0.13); top:50%; left:50%; transform:translate(-50%,-50%); }
+.r1 { width:min(500px,90vw); height:min(500px,90vw); }
+.r2 { width:min(680px,125vw); height:min(680px,125vw); border-color:rgba(200,150,62,0.07); }
+.r3 { width:min(870px,155vw); height:min(870px,155vw); border-color:rgba(200,150,62,0.04); }
+.hero-content { position:relative; text-align:center; z-index:2; width:100%; }
+.hero-eyebrow { font-family:'DM Mono',monospace; font-size:clamp(0.45rem,1.8vw,0.65rem); letter-spacing:0.3em; text-transform:uppercase; color:var(--gold); margin-bottom:1.5rem; display:block; opacity:0; transform:translateY(20px); }
+.hero-title { font-size:clamp(3.2rem,11vw,11rem); font-weight:300; line-height:0.88; letter-spacing:-0.02em; color:var(--cream); opacity:0; transform:translateY(80px); }
+.hero-title em { font-style:italic; color:var(--gold-light); }
+.hero-sub { font-size:clamp(0.85rem,2.2vw,1.15rem); font-weight:300; color:var(--muted); margin-top:1.5rem; letter-spacing:0.04em; opacity:0; transform:translateY(20px); line-height:1.7; }
+.hero-cta { margin-top:2.5rem; display:flex; gap:1rem; justify-content:center; opacity:0; transform:translateY(20px); flex-wrap:wrap; }
+.btn-gold { padding:0.85rem 2rem; background:var(--gold); color:var(--espresso); border:none; font-family:'DM Mono',monospace; font-size:0.65rem; letter-spacing:0.2em; text-transform:uppercase; text-decoration:none; display:inline-block; transition:background 0.3s,transform 0.3s; }
+.btn-gold:hover { background:var(--gold-light); transform:translateY(-3px); }
+.btn-outline { padding:0.85rem 2rem; background:transparent; color:var(--cream); border:1px solid rgba(245,239,224,0.3); font-family:'DM Mono',monospace; font-size:0.65rem; letter-spacing:0.2em; text-transform:uppercase; text-decoration:none; display:inline-block; transition:border-color 0.3s,transform 0.3s; }
+.btn-outline:hover { border-color:var(--gold); transform:translateY(-3px); }
+.steam-wrap { position:absolute; bottom:12%; left:50%; transform:translateX(-50%); display:flex; gap:14px; }
+.stm { width:2px; border-radius:2px; background:linear-gradient(to top,var(--gold),transparent); animation:stm 3s ease-in-out infinite; }
+.stm:nth-child(1){height:50px;} .stm:nth-child(2){height:35px;animation-delay:0.6s;} .stm:nth-child(3){height:65px;animation-delay:1.1s;}
+@keyframes stm{0%,100%{transform:scaleY(1) translateY(0);opacity:0.35;}50%{transform:scaleY(1.2) translateY(-10px);opacity:0.7;}}
+.scroll-hint { position:absolute; bottom:2.5rem; left:50%; transform:translateX(-50%); display:flex; flex-direction:column; align-items:center; gap:0.5rem; opacity:0; }
+.scroll-hint span { font-family:'DM Mono',monospace; font-size:0.55rem; letter-spacing:0.3em; text-transform:uppercase; color:var(--muted); }
+.scroll-line { width:1px; height:45px; background:linear-gradient(to bottom,var(--gold),transparent); animation:sline 2s ease-in-out infinite; }
+@keyframes sline{0%{transform:scaleY(0);transform-origin:top;}50%{transform:scaleY(1);transform-origin:top;}51%{transform:scaleY(1);transform-origin:bottom;}100%{transform:scaleY(0);transform-origin:bottom;}}
+
+/* ABOUT */
+.about { padding:8rem 3rem; max-width:1400px; margin:0 auto; display:grid; grid-template-columns:1fr 1fr; gap:6rem; align-items:center; }
+.about-label { font-family:'DM Mono',monospace; font-size:0.6rem; letter-spacing:0.35em; text-transform:uppercase; color:var(--gold); margin-bottom:1.5rem; display:block; }
+.about-title { font-size:clamp(2rem,4vw,4.5rem); font-weight:300; line-height:1.1; }
+.about-title em { font-style:italic; color:var(--gold-light); }
+.about-text { font-size:clamp(0.9rem,1.6vw,1.05rem); line-height:1.9; color:var(--muted); font-weight:300; margin-top:1.2rem; }
+.about-visual { position:relative; height:480px; }
+.about-card { position:absolute; background:linear-gradient(135deg,#2A1500,#1A0F00); border:1px solid rgba(200,150,62,0.18); padding:2.5rem; }
+.about-card-1 { top:0; right:0; width:75%; height:58%; }
+.about-card-2 { bottom:0; left:0; width:55%; height:40%; }
+.stat-num { font-size:clamp(2.5rem,5vw,4.5rem); font-weight:300; color:var(--gold); line-height:1; }
+.stat-label { font-family:'DM Mono',monospace; font-size:0.52rem; letter-spacing:0.15em; color:var(--muted); text-transform:uppercase; margin-top:0.4rem; line-height:1.6; }
+
+/* MENU */
+.menu-section { padding:6rem 2rem; background:#110800; position:relative; }
+.menu-section::before { content:''; position:absolute; top:0; left:0; right:0; height:1px; background:linear-gradient(90deg,transparent,var(--gold),transparent); }
+.section-header { text-align:center; margin-bottom:5rem; padding:0 1rem; }
+.section-label { font-family:'DM Mono',monospace; font-size:clamp(0.45rem,1.6vw,0.65rem); letter-spacing:0.28em; text-transform:uppercase; color:var(--gold); margin-bottom:1.2rem; display:block; }
+.section-title { font-size:clamp(2.2rem,6vw,6rem); font-weight:300; line-height:1; }
+.section-title em { font-style:italic; color:var(--gold-light); }
+.menu-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:2px; max-width:1200px; margin:0 auto; }
+.menu-item { padding:2.5rem 2rem; border:1px solid rgba(200,150,62,0.1); background:var(--espresso); position:relative; overflow:hidden; transition:background 0.4s; }
+.menu-item::after { content:''; position:absolute; bottom:0; left:0; right:0; height:2px; background:var(--gold); transform:scaleX(0); transform-origin:left; transition:transform 0.4s; }
+.menu-item:hover { background:#1f1000; }
+.menu-item:hover::after { transform:scaleX(1); }
+.menu-num { font-family:'DM Mono',monospace; font-size:0.55rem; color:var(--gold); letter-spacing:0.3em; margin-bottom:1.2rem; opacity:0.5; }
+.menu-icon { font-size:2rem; margin-bottom:1rem; display:block; }
+.menu-name { font-size:clamp(1.3rem,2.2vw,1.9rem); font-weight:300; color:var(--cream); margin-bottom:0.7rem; line-height:1.2; transition:transform 0.3s; }
+.menu-item:hover .menu-name { transform:translateX(6px); }
+.menu-desc { font-size:clamp(0.8rem,1.4vw,0.95rem); color:var(--muted); line-height:1.8; font-weight:300; }
+.menu-price { margin-top:1.5rem; font-family:'DM Mono',monospace; font-size:0.85rem; color:var(--gold); letter-spacing:0.1em; }
+
+/* PROCESS */
+.process-section { padding:7rem 2rem; max-width:1300px; margin:0 auto; }
+.process-steps { margin-top:5rem; display:grid; grid-template-columns:repeat(4,1fr); gap:2.5rem; position:relative; }
+.process-line { position:absolute; top:0.35rem; left:0.35rem; right:0.35rem; height:1px; background:rgba(200,150,62,0.25); }
+.process-line-fill { position:absolute; top:0.35rem; left:0.35rem; right:0.35rem; height:1px; background:linear-gradient(90deg,var(--gold),rgba(200,150,62,0.4)); transform:scaleX(0); transform-origin:left; }
+.process-step { position:relative; }
+.process-dot { width:9px; height:9px; border-radius:50%; background:var(--gold); margin-bottom:2.5rem; position:relative; z-index:2; box-shadow:0 0 18px rgba(200,150,62,0.5); }
+.process-step-num { font-family:'DM Mono',monospace; font-size:0.55rem; color:var(--gold); letter-spacing:0.3em; margin-bottom:1rem; opacity:0.55; }
+.process-step-title { font-size:clamp(1.2rem,2vw,1.7rem); font-weight:300; color:var(--cream); margin-bottom:0.7rem; }
+.process-step-desc { font-size:clamp(0.8rem,1.3vw,0.9rem); color:var(--muted); line-height:1.8; font-weight:300; }
+
+/* TESTIMONIAL */
+.testi { background:#0C0500; padding:8rem 2rem; text-align:center; position:relative; overflow:hidden; }
+.testi::before { content:''; position:absolute; top:-300px; left:50%; transform:translateX(-50%); width:900px; height:900px; border-radius:50%; border:1px solid rgba(200,150,62,0.05); }
+.quote-mark { font-size:clamp(5rem,12vw,12rem); color:var(--gold); opacity:0.07; line-height:1; font-family:Georgia,serif; margin-bottom:-3rem; display:block; }
+.testi-quote { font-size:clamp(1.2rem,2.8vw,3rem); font-weight:300; font-style:italic; line-height:1.5; color:var(--cream); max-width:900px; margin:0 auto; position:relative; z-index:2; }
+.testi-author { margin-top:2.5rem; font-family:'DM Mono',monospace; font-size:0.65rem; letter-spacing:0.3em; text-transform:uppercase; color:var(--gold); position:relative; z-index:2; }
+
+/* FOOTER */
+footer { padding:4rem 2rem; border-top:1px solid rgba(200,150,62,0.15); display:flex; justify-content:space-between; align-items:flex-end; flex-wrap:wrap; gap:2rem; }
+.footer-logo { font-size:clamp(1.8rem,4vw,3rem); font-weight:300; letter-spacing:0.4em; color:var(--gold-light); opacity:0.5; text-transform:uppercase; }
+.footer-info { font-family:'DM Mono',monospace; font-size:0.6rem; letter-spacing:0.12em; color:var(--muted); text-align:right; line-height:2.3; }
+.by-yosh { color:var(--gold); letter-spacing:0.2em; }
+
+/* PARTICLES */
+.particle { position:fixed; width:3px; height:3px; border-radius:50%; background:var(--gold); pointer-events:none; opacity:0; z-index:50; }
+
+/* LIVE WIDGET */
+#live-widget { position:fixed; bottom:1.5rem; right:1.5rem; z-index:500; display:flex; flex-direction:column; gap:0.5rem; align-items:flex-end; }
+.live-card { background:rgba(26,15,0,0.92); backdrop-filter:blur(16px); border:1px solid rgba(200,150,62,0.25); padding:0.6rem 1rem; display:flex; align-items:center; gap:0.6rem; min-width:155px; }
+.live-dot { width:8px; height:8px; border-radius:50%; background:#4ade80; box-shadow:0 0 8px #4ade80; flex-shrink:0; animation:pdot 1.8s ease-in-out infinite; }
+.live-dot.total-dot { background:var(--gold); box-shadow:0 0 8px var(--gold); animation:none; }
+@keyframes pdot{0%,100%{box-shadow:0 0 6px #4ade80;transform:scale(1);}50%{box-shadow:0 0 18px #4ade80,0 0 30px rgba(74,222,128,0.3);transform:scale(1.25);}}
+.live-text { display:flex; flex-direction:column; }
+.live-label { font-family:'DM Mono',monospace; font-size:0.5rem; letter-spacing:0.2em; text-transform:uppercase; color:var(--muted); }
+.live-count { font-family:'Cormorant Garamond',serif; font-size:1.3rem; font-weight:300; color:var(--cream); line-height:1; }
+.live-status { display:flex; align-items:center; gap:0.4rem; font-family:'DM Mono',monospace; font-size:0.5rem; letter-spacing:0.15em; text-transform:uppercase; color:#4ade80; padding:0.3rem 0.7rem; background:rgba(74,222,128,0.08); border:1px solid rgba(74,222,128,0.2); }
+.live-status-dot { width:5px; height:5px; border-radius:50%; background:#4ade80; animation:pdot 1.8s ease-in-out infinite; }
+
+/* HUGOT BANNER */
+.hugot-banner { background:#0A0400; border-top:1px solid rgba(200,150,62,0.15); border-bottom:1px solid rgba(200,150,62,0.15); padding:0.9rem 0; overflow:hidden; white-space:nowrap; }
+.hugot-ticker { display:inline-block; animation:ticker 30s linear infinite; }
+.hugot-ticker span { font-family:'Cormorant Garamond',serif; font-style:italic; font-size:clamp(0.85rem,2vw,1.05rem); color:var(--muted); }
+.hugot-ticker span em { color:var(--gold); font-style:normal; }
+@keyframes ticker { 0%{transform:translateX(0);} 100%{transform:translateX(-50%);} }
+#loader { position:fixed; inset:0; background:var(--espresso); z-index:1000; display:flex; align-items:center; justify-content:center; flex-direction:column; gap:2rem; }
+#loader-logo { font-size:clamp(2.5rem,7vw,4rem); font-weight:300; letter-spacing:0.5em; text-transform:uppercase; color:var(--gold-light); opacity:0; }
+#loader-bar-wrap { width:160px; height:1px; background:rgba(200,150,62,0.2); }
+#loader-bar { height:100%; width:0%; background:var(--gold); }
+#loader-hugot { font-family:'Cormorant Garamond',serif; font-style:italic; font-size:clamp(0.8rem,2vw,1rem); color:var(--muted); opacity:0; text-align:center; max-width:340px; line-height:1.7; padding:0 1rem; animation:loaderHugot 1s ease 0.8s forwards; }
+@keyframes loaderHugot { to { opacity:0.7; } }
+
+/* ══ RESPONSIVE ══ */
+@media(max-width:900px){
+  .hamburger { display:flex; }
+  .nav-links { display:none; }
+  .about { grid-template-columns:1fr; padding:5rem 1.5rem; gap:3rem; }
+  .about-visual { height:360px; }
+  .menu-grid { grid-template-columns:repeat(2,1fr); }
+  .process-steps { grid-template-columns:1fr 1fr; }
+  .process-line,.process-line-fill { display:none; }
+  footer { flex-direction:column; align-items:flex-start; }
+  .footer-info { text-align:left; }
+}
+@media(max-width:540px){
+  .menu-grid { grid-template-columns:1fr; }
+  .process-steps { grid-template-columns:1fr; }
+  .hero-cta { flex-direction:column; align-items:center; }
+  .btn-gold,.btn-outline { width:100%; max-width:280px; text-align:center; }
+  .about-visual { height:300px; }
+  .about-card { padding:1.5rem; }
+  .about-card-1 { width:88%; }
+  .about-card-2 { width:68%; }
+  .testi { padding:6rem 1.2rem; }
+  #live-widget { bottom:1rem; right:0.8rem; }
+  .live-card { min-width:130px; padding:0.5rem 0.8rem; }
+}
+</style>
+</head>
+<body>
+
+<!-- LOADER -->
+<div id="loader">
+  <div id="loader-logo">YOSHbrew</div>
+  <div id="loader-bar-wrap"><div id="loader-bar"></div></div>
+  <div id="loader-hugot">Naglo-load pa kami... katulad ng iyong ex na nangako pero hindi dumating. 🥲</div>
+</div>
+
+<!-- CURSOR -->
+<div id="cur"></div>
+<div id="cur-ring"></div>
+
+<!-- NAV -->
+<nav id="nav">
+  <a href="#" class="nav-logo">YOSHbrew</a>
+  <ul class="nav-links">
+    <li><a href="#menu">Menu</a></li>
+    <li><a href="#process">Proseso</a></li>
+    <li><a href="#about">Kwento</a></li>
+    <li><a href="#" class="nav-btn">Puntahan Mo Kami</a></li>
+  </ul>
+  <button class="hamburger" id="hamburger" aria-label="Open menu">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<!-- MOBILE DRAWER -->
+<div class="mobile-nav" id="mobileNav">
+  <button class="mobile-close" id="mobileClose">✕</button>
+  <a href="#menu" class="mobile-link">Menu</a>
+  <a href="#process" class="mobile-link">Proseso</a>
+  <a href="#about" class="mobile-link">Kwento</a>
+  <a href="#" class="nav-btn">Puntahan Mo Kami</a>
+</div>
+
+<!-- HERO -->
+<section class="hero" id="home">
+  <div class="hero-bg"></div>
+  <div class="hero-grain"></div>
+  <div class="ring r1"></div>
+  <div class="ring r2"></div>
+  <div class="ring r3"></div>
+  <div class="hero-content">
+    <span class="hero-eyebrow">Est. 2026 · Para sa Nagmahal nang Tapat · Pero Hindi Naging Sapat</span>
+    <h1 class="hero-title">Ang Arte<br>ng <em>Yosh</em><br>Brew</h1>
+    <p class="hero-sub">
+      Kape na hindi kailanman mag-iiwan sa iyo — <em>hindi katulad ng iba.</em> 🤌<br>
+      Dahil deserve mo ang something na nananatili.
+    </p>
+    <div class="hero-cta">
+      <a href="#menu" class="btn-gold">Tingnan ang Menu</a>
+      <a href="#process" class="btn-outline">Paano Namin Ginagawa</a>
+    </div>
+  </div>
+  <div class="steam-wrap">
+    <div class="stm"></div><div class="stm"></div><div class="stm"></div>
+  </div>
+  <div class="scroll-hint" id="scrollHint">
+    <span>I-scroll mo na — may mas masakit pa sa baba 😭</span>
+    <div class="scroll-line"></div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section class="about" id="about">
+  <div class="about-left">
+    <span class="about-label">Ang Aming Kwento — Kaway Kaway sa Lahat ng Nasaktan 🖐️</span>
+    <h2 class="about-title">Nagmahal<br>ng tapat, <em>pero<br>di naging</em> sapat.</h2>
+    <p class="about-text">Ganyan din ang simula ng YOSHbrew. Nagbigay kami ng lahat — oras, pera, pagod, puso — sa isang pangarap na hindi siguradong babalik. Pero tulad ng magandang kape, ang pinaka-masarap na bagay sa buhay ay yung pinaghandaan mo kahit walang garantiya.</p>
+    <p class="about-text">Bawat tasa ay isang paalala: kahit mapait ang buhay, may tamis pa rin kung hahanapin mo. Hindi kami basta nagpapalit ng tubig at kape ha. Mahal namin ang ginagawa namin — at hindi kami titigil, kahit sabihing hindi sapat. 😤</p>
+    <p class="about-text">Kaya sa bawat umaga na mahirap bumangon, sa bawat gabi na hindi makatulog dahil sa iniisip mo siya — nandito ang YOSHbrew. Hindi ka namin paaalisin. Hindi ka namin iiwan. Hindi kami katulad niya. 🫂</p>
+  </div>
+  <div class="about-visual">
+    <div class="about-card about-card-1">
+      <div class="stat-num" id="c1">0</div>
+      <p class="stat-label">Farms na pinagkukunan namin<br>(nagmahal kami ng tapat dito)</p>
+      <div style="margin-top:1.8rem;">
+        <div class="stat-num" id="c2">0</div>
+        <p class="stat-label">Tasang naibenta — bawat isa<br>may kwento ng luha o tawa 🥹</p>
+      </div>
+    </div>
+    <div class="about-card about-card-2">
+      <div class="stat-num" id="c3">0</div>
+      <p class="stat-label">Taon na kaming nandito —<br>hindi kami aalis, promise. 🤞</p>
+    </div>
+  </div>
+</section>
+
+<!-- MENU -->
+<section class="menu-section" id="menu">
+  <div class="section-header">
+    <span class="section-label">Para sa Lahat ng Nasaktan — Eto ang Menu Niyo, Lodi 🖐️</span>
+    <h2 class="section-title">Ang <em>Menu</em> 💔</h2>
+    <p style="font-family:'Cormorant Garamond',serif;font-style:italic;color:var(--muted);font-size:clamp(1rem,2vw,1.2rem);margin-top:1.5rem;max-width:600px;margin-left:auto;margin-right:auto;line-height:1.8;">
+      "Bawat inumin ay may kwento. Baka katulad ng sa iyo — mapait sa simula, may tamis sa dulo, at hindi mo malaman kung uulit ka o hindi... pero uulit ka. Lagi." ☕
+    </p>
+  </div>
+  <div class="menu-grid" id="menuGrid">
+
+    <div class="menu-item">
+      <p class="menu-num">01</p><span class="menu-icon">☕</span>
+      <h3 class="menu-name">Yosh Espresso</h3>
+      <p class="menu-desc">Double shot, mapait, direkta sa puso. Katulad ng katotohanan na ayaw mong tanggapin — masakit ngayon, pero mas maayos ka pagkatapos. Promise. Hindi katulad niya. 💀</p>
+      <p class="menu-price">₱ 290</p>
+    </div>
+
+    <div class="menu-item">
+      <p class="menu-num">02</p><span class="menu-icon">🫗</span>
+      <h3 class="menu-name">Yosh Cortado</h3>
+      <p class="menu-desc">Espresso at gatas — magkaibang mundo pero nagtagpo. Tamang-tama ang balanse. Katulad ng relasyong gustong-gusto mo sana. Meron ba niyan? Wala pa namin nakita, pero nandito pa rin kami. 🥹</p>
+      <p class="menu-price">₱ 340</p>
+    </div>
+
+    <div class="menu-item">
+      <p class="menu-num">03</p><span class="menu-icon">🧊</span>
+      <h3 class="menu-name">Cold Immersion</h3>
+      <p class="menu-desc">24 oras sa dilim, nag-iisa, sa malamig — para lumabas na mas maganda. Katulad mo ngayon, lodi. Ang lahat ng pinagdadaanan mo ay may dahilan. Hintayin mo lang ang resulta. 🥶</p>
+      <p class="menu-price">₱ 370</p>
+    </div>
+
+    <div class="menu-item">
+      <p class="menu-num">04</p><span class="menu-icon">🍵</span>
+      <h3 class="menu-name">Siphon Pour</h3>
+      <p class="menu-desc">Mahal, matagal, at kailangan pa ng espesyal na kagamitan para magawa. Katulad mo — hindi basta-basta, kailangan ng tama at may pasensyang tao para ma-appreciate ka nang wasto. 😤</p>
+      <p class="menu-price">₱ 480</p>
+    </div>
+
+    <div class="menu-item">
+      <p class="menu-num">05</p><span class="menu-icon">🌿</span>
+      <h3 class="menu-name">Ceremonial Matcha</h3>
+      <p class="menu-desc">Hindi siya coffee pero lagi siyang nandito — katulad ng tao sa buhay mo na lagi mong pinagkakasabihan ng problema mo pero hindi mo siya tinitingnan ng romantiko. Tignan mo siya. Seriously. 👁️</p>
+      <p class="menu-price">₱ 395</p>
+    </div>
+
+    <div class="menu-item">
+      <p class="menu-num">06</p><span class="menu-icon">✨</span>
+      <h3 class="menu-name">Signature Blend</h3>
+      <p class="menu-desc">Hindi namin alam ang lasa ngayon — palaging nagbabago. Katulad ng taong mahal mo na hindi mo ma-predict. Isang araw matamis, isang araw maasim. Pero bumabalik ka pa rin. Tayo lahat. 😔</p>
+      <p class="menu-price">₱ 420</p>
+    </div>
+
+    <div class="menu-item">
+      <p class="menu-num">07</p><span class="menu-icon">🥛</span>
+      <h3 class="menu-name">Yosh Dalgona</h3>
+      <p class="menu-desc">400 beses binato nang walang tigil para maging ganito kaganda. Katulad ng effort mo sa taong hindi mo pa rin nakukuha. Pero tingnan mo — kahit siya wala, grabe ka pa rin kung gawin ang sarili mong buhay. 💪</p>
+      <p class="menu-price">₱ 310</p>
+    </div>
+
+    <div class="menu-item">
+      <p class="menu-num">08</p><span class="menu-icon">🍫</span>
+      <h3 class="menu-name">Tablea Hot Choco</h3>
+      <p class="menu-desc">Mainit, matamis, at hindi kailanman magiging masama ang lasa. Para sa mga araw na gusto mong sabihin ng "okay lang ako" pero hindi ka. Nandito kami. Hindi kami magtatanong. Inom ka lang. 🫂</p>
+      <p class="menu-price">₱ 275</p>
+    </div>
+
+    <div class="menu-item">
+      <p class="menu-num">09</p><span class="menu-icon">🧃</span>
+      <h3 class="menu-name">Calamansi Fizz</h3>
+      <p class="menu-desc">Maasim, masabaw, pero parang lumakas ka pagkatapos. Para sa mga araw na gusto mong maging bitter na lang — okay lang maging ganon sandali. Basta huwag manatili doon. Kaya mo umaangat. 🫶</p>
+      <p class="menu-price">₱ 250</p>
+    </div>
+
+  </div>
+</section>
+
+<!-- PROCESS -->
+<section class="process-section" id="process">
+  <div class="section-header">
+    <span class="section-label">Paano Namin Ginagawa — Tulad ng Pagmamahal, May Proseso Ito</span>
+    <h2 class="section-title">Ang <em>Proseso</em> 💛</h2>
+  </div>
+  <div class="process-steps" id="processSteps">
+    <div class="process-line"></div>
+    <div class="process-line-fill" id="pFill"></div>
+    <div class="process-step">
+      <div class="process-dot"></div>
+      <p class="process-step-num">01 — Kuhanin</p>
+      <h3 class="process-step-title">Pumunta Kami</h3>
+      <p class="process-step-desc">Personal kaming pumunta sa bawat farm. Hindi kami nag-abot ng mensahe tapos nag-ghost — nandoon kami, in person, committed. Sana merong tao sa buhay mo na ganon din. 🙏</p>
+    </div>
+    <div class="process-step">
+      <div class="process-dot"></div>
+      <p class="process-step-num">02 — I-roast</p>
+      <h3 class="process-step-title">Pinaghandaan</h3>
+      <p class="process-step-desc">Dahan-dahan namin itong inihaw — walang madali, walang shortcuts. Dahil ang mga bagay na may halaga, pinaghandaan mo. Sana alam niya kung gaano ka kagandang tao. 😶🔥</p>
+    </div>
+    <div class="process-step">
+      <div class="process-dot"></div>
+      <p class="process-step-num">03 — Pahinga</p>
+      <h3 class="process-step-title">Binigyan ng Oras</h3>
+      <p class="process-step-desc">72 oras na pahinga — dahil lahat ng bagay na worth it ay kailangan ng oras para maging ganap. Kasama ka. Huwag mong pilitin ang sarili mong maging okay agad. May oras ka. 🧘💛</p>
+    </div>
+    <div class="process-step">
+      <div class="process-dot" style="background:var(--gold-light);box-shadow:0 0 20px rgba(232,188,106,0.5);"></div>
+      <p class="process-step-num">04 — Ihain</p>
+      <h3 class="process-step-title">Nandito Kami</h3>
+      <p class="process-step-desc">Sa huli, iniabot namin sa iyo nang buong puso — walang kondisyon, walang "depende." Hindi kami katulad ng nag-iiwan. Nandito ang kape mo. Nandito kami. Lagi. ☕🫂</p>
+    </div>
+  </div>
+</section>
+
+<!-- HUGOT BANNER -->
+<div class="hugot-banner">
+  <div class="hugot-ticker">
+    <span>☕ Nagmahal ng tapat, pero di naging sapat &nbsp;·&nbsp; </span>
+    <span>💔 Ang kape namin, hindi kailanman mag-iiwanan sa iyo &nbsp;·&nbsp; </span>
+    <span>🫂 Kaway kaway sa lahat ng nasaktan pero nagpatuloy pa rin &nbsp;·&nbsp; </span>
+    <span>✨ Hindi ka kulang — mali lang ang timing &nbsp;·&nbsp; </span>
+    <span>☕ Nagmahal ng tapat, pero di naging sapat &nbsp;·&nbsp; </span>
+    <span>💔 Ang kape namin, hindi kailanman mag-iiwanan sa iyo &nbsp;·&nbsp; </span>
+    <span>🫂 Kaway kaway sa lahat ng nasaktan pero nagpatuloy pa rin &nbsp;·&nbsp; </span>
+    <span>✨ Hindi ka kulang — mali lang ang timing &nbsp;·&nbsp; </span>
+  </div>
+</div>
+
+<!-- TESTIMONIAL -->
+<div class="testi">
+  <span class="quote-mark">"</span>
+  <blockquote class="testi-quote" id="testiQ">
+    "Uminom ako ng isang tasa ng YOSHbrew habang nakaka-text sa kanya. Hindi siya sumagot. Pero ang kape sumagot — mainit, matamis, hindi nagpapabaya. Naiyak ako. Hindi dahil masama ang kape. Dahil napaka-ganda ng naging sapat."
+  </blockquote>
+  <p class="testi-author" id="testiA">— Ate Karen G., Suki simula pa nung first month namin 🥲</p>
+</div>
+
+<!-- LIVE WIDGET -->
+<div id="live-widget">
+  <div class="live-status"><div class="live-status-dot"></div>LIVE</div>
+  <div class="live-card">
+    <div class="live-dot"></div>
+    <div class="live-text">
+      <span class="live-label">Online ngayon</span>
+      <div class="live-count"><span id="liveOnline">—</span> tao</div>
+    </div>
+  </div>
+  <div class="live-card">
+    <div class="live-dot total-dot"></div>
+    <div class="live-text">
+      <span class="live-label">Kabuuang bisita</span>
+      <div class="live-count"><span id="liveTotal">—</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">YOSHbrew</div>
+  <div class="footer-info">
+    47 Golden Lane, Merchant Quarter<br>
+    Bukas Araw-araw · 7am — 9pm<br>
+    <em style="color:var(--gold);font-family:'Cormorant Garamond',serif;font-style:italic;">"Huwag kang lumayo, nandito lang kami."</em><br>
+    hello@yoshbrew.co<br><br>
+    © 2026 YOSHbrew · Lahat ng Karapatan Nakalaan<br>
+    <span class="by-yosh">Ginawa nang may pagmamahal ni Yosh ♥<br>
+    <em style="font-family:'Cormorant Garamond',serif;font-style:italic;font-size:0.7rem;color:var(--muted);">Para sa lahat ng nagmahal ng tapat pero hindi pa rin naging sapat — ito para sa inyo.</em></span>
+  </div>
+</footer>
+
+<script>
+// HAMBURGER
+document.getElementById('hamburger').addEventListener('click',()=>document.getElementById('mobileNav').classList.add('open'));
+document.getElementById('mobileClose').addEventListener('click',()=>document.getElementById('mobileNav').classList.remove('open'));
+document.querySelectorAll('.mobile-link,.mobile-nav .nav-btn').forEach(a=>a.addEventListener('click',()=>document.getElementById('mobileNav').classList.remove('open')));
+
+// LOAD GSAP
+function loadScript(src,cb){const s=document.createElement('script');s.src=src;s.onload=cb;s.onerror=()=>useCSSFallback();document.head.appendChild(s);}
+loadScript('https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js',()=>{
+  loadScript('https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js',initGSAP);
+});
+
+function initGSAP(){
+  gsap.registerPlugin(ScrollTrigger);
+
+  // LOADER
+  gsap.timeline({onComplete:()=>{
+    gsap.to('#loader',{opacity:0,duration:0.6,onComplete:()=>document.getElementById('loader').remove()});
+    gsap.timeline()
+      .to('.hero-eyebrow',{opacity:1,y:0,duration:1,ease:'power3.out'})
+      .to('.hero-title',  {opacity:1,y:0,duration:1.4,ease:'power4.out'},'-=0.5')
+      .to('.hero-sub',    {opacity:1,y:0,duration:1,ease:'power3.out'},'-=0.7')
+      .to('.hero-cta',    {opacity:1,y:0,duration:1,ease:'power3.out'},'-=0.6')
+      .to('#scrollHint',  {opacity:0.7,duration:1,ease:'power3.out'},'-=0.3');
+  }})
+  .to('#loader-logo',{opacity:1,y:0,duration:0.8,ease:'power3.out',from:{y:30}})
+  .to('#loader-bar',{width:'100%',duration:1.4,ease:'power2.inOut'},'-=0.4')
+  .to('#loader-logo',{opacity:0,y:-20,duration:0.5,ease:'power2.in'},'+=0.2')
+  .to('#loader-bar',{opacity:0,duration:0.3},'<');
+
+  // RINGS
+  gsap.to('.r1',{scale:1.06,duration:4,repeat:-1,yoyo:true,ease:'sine.inOut'});
+  gsap.to('.r2',{scale:1.04,duration:6,repeat:-1,yoyo:true,ease:'sine.inOut',delay:1});
+  gsap.to('.r3',{scale:1.02,duration:8,repeat:-1,yoyo:true,ease:'sine.inOut',delay:2});
+  gsap.to('.r1',{rotation:360,duration:40,repeat:-1,ease:'none'});
+  gsap.to('.r2',{rotation:-360,duration:60,repeat:-1,ease:'none'});
+
+  // NAV
+  ScrollTrigger.create({start:'top -60',onUpdate(s){
+    gsap.to('nav',{backgroundColor:s.progress>0?'rgba(26,15,0,0.92)':'rgba(0,0,0,0)',backdropFilter:s.progress>0?'blur(14px)':'blur(0px)',duration:0.4});
+  }});
+
+  // HERO PARALLAX
+  gsap.to('.hero-content',{scrollTrigger:{trigger:'.hero',start:'top top',end:'bottom top',scrub:1},y:120,opacity:0});
+
+  // ABOUT
+  gsap.from('.about-left > *',{scrollTrigger:{trigger:'.about',start:'top 72%'},opacity:0,y:60,stagger:0.18,duration:1.2,ease:'power3.out'});
+  gsap.from('.about-card-1',{scrollTrigger:{trigger:'.about-visual',start:'top 75%'},opacity:0,x:80,rotation:3,duration:1.2,ease:'power3.out'});
+  gsap.from('.about-card-2',{scrollTrigger:{trigger:'.about-visual',start:'top 75%'},opacity:0,x:-60,rotation:-2,duration:1.3,delay:0.2,ease:'power3.out'});
+
+  // COUNTERS
+  function cnt(id,target,suffix=''){const el=document.getElementById(id);ScrollTrigger.create({trigger:el,start:'top 80%',onEnter:()=>gsap.to({v:0},{v:target,duration:2,ease:'power2.out',onUpdate(){el.textContent=Math.round(this.targets()[0].v).toLocaleString()+suffix;}})});}
+  cnt('c1',42); cnt('c2',85000,'+'); cnt('c3',5);
+
+  // MENU
+  gsap.from('.menu-item',{scrollTrigger:{trigger:'#menuGrid',start:'top 78%'},opacity:0,y:80,rotationX:15,stagger:{amount:1.1,from:'start'},duration:1,ease:'power3.out',transformOrigin:'top center'});
+
+  // PROCESS
+  gsap.to('#pFill',{scrollTrigger:{trigger:'#processSteps',start:'top 70%',end:'bottom 60%',scrub:1},scaleX:1,ease:'none'});
+  gsap.from('.process-step',{scrollTrigger:{trigger:'#processSteps',start:'top 75%'},opacity:0,y:50,stagger:0.25,duration:1.1,ease:'power3.out'});
+  gsap.to('.process-dot',{boxShadow:'0 0 35px rgba(200,150,62,0.9)',duration:1.5,repeat:-1,yoyo:true,ease:'sine.inOut',stagger:{each:0.4}});
+
+  // TESTI
+  gsap.from('#testiQ',{scrollTrigger:{trigger:'#testiQ',start:'top 82%'},opacity:0,y:50,duration:1.5,ease:'power3.out'});
+  gsap.from('#testiA',{scrollTrigger:{trigger:'#testiA',start:'top 88%'},opacity:0,y:20,duration:1,delay:0.4,ease:'power3.out'});
+
+  // SECTION HEADERS
+  document.querySelectorAll('.section-header').forEach(h=>{
+    gsap.from(h.children,{scrollTrigger:{trigger:h,start:'top 80%'},opacity:0,y:40,stagger:0.15,duration:1,ease:'power3.out'});
+  });
+
+  // FOOTER
+  gsap.from('footer > *',{scrollTrigger:{trigger:'footer',start:'top 85%'},opacity:0,y:30,stagger:0.2,duration:1,ease:'power3.out'});
+
+  // CURSOR + INTERACTIONS (desktop only)
+  const isTouch = window.matchMedia('(hover:none)').matches;
+  if(!isTouch){
+    const cur=document.getElementById('cur'),ring=document.getElementById('cur-ring');
+    let mx=0,my=0,rx=0,ry=0;
+    document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;gsap.to(cur,{x:mx,y:my,duration:0.08});});
+    (function tick(){rx+=(mx-rx)*0.1;ry+=(my-ry)*0.1;gsap.set(ring,{x:rx,y:ry});requestAnimationFrame(tick);})();
+    document.querySelectorAll('a,button,.menu-item').forEach(el=>{
+      el.addEventListener('mouseenter',()=>{gsap.to(cur,{scale:0.4,duration:0.3});gsap.to(ring,{scale:1.8,borderColor:'rgba(200,150,62,0.9)',duration:0.3});});
+      el.addEventListener('mouseleave',()=>{gsap.to(cur,{scale:1,duration:0.3});gsap.to(ring,{scale:1,borderColor:'rgba(200,150,62,1)',duration:0.3});});
+    });
+    document.addEventListener('click',e=>{
+      for(let i=0;i<10;i++){
+        const p=document.createElement('div');p.className='particle';document.body.appendChild(p);
+        const a=(i/10)*Math.PI*2,d=40+Math.random()*60;
+        gsap.set(p,{x:e.clientX,y:e.clientY});
+        gsap.to(p,{x:e.clientX+Math.cos(a)*d,y:e.clientY+Math.sin(a)*d,opacity:0.9,scale:1,duration:0.1,onComplete:()=>gsap.to(p,{opacity:0,scale:0,duration:0.5,onComplete:()=>p.remove()})});
+      }
+    });
+    document.querySelectorAll('.btn-gold,.btn-outline,.nav-btn').forEach(btn=>{
+      btn.addEventListener('mousemove',e=>{const r=btn.getBoundingClientRect();gsap.to(btn,{x:(e.clientX-(r.left+r.width/2))*0.25,y:(e.clientY-(r.top+r.height/2))*0.25,duration:0.4,ease:'power2.out'});});
+      btn.addEventListener('mouseleave',()=>gsap.to(btn,{x:0,y:0,duration:0.5,ease:'elastic.out(1,0.4)'}));
+    });
+  }
+  document.querySelectorAll('.menu-item').forEach(item=>{
+    item.addEventListener('mouseenter',()=>gsap.to(item.querySelector('.menu-name'),{x:8,duration:0.3,ease:'power2.out'}));
+    item.addEventListener('mouseleave',()=>gsap.to(item.querySelector('.menu-name'),{x:0,duration:0.3,ease:'power2.out'}));
+  });
 }
 
-/* ── CURSOR ── */
-#cur { position:fixed; width:12px; height:12px; background:var(--gold); border-radius:50%; pointer-events:none; z-index:9999; top:0; left:0; transform:translate(-50%,-50%); }
-#cur-ring { position:fixed; width:44px; height:44px; border:1px solid var(--gold); border-radius:50%; pointer-events:none; z-index:9998; top:0; left:0; transform:translate(-50%,-50%); }
+function useCSSFallback(){
+  document.getElementById('loader').style.display='none';
+  const s=document.createElement('style');
+  s.textContent='@keyframes fu{from{opacity:0;transform:translateY(50px);}to{opacity:1;transform:translateY(0);}}.hero-eyebrow,.hero-title,.hero-sub,.hero-cta{animation:fu 1s ease forwards;}.hero-title{animation-delay:.2s}.hero-sub{animation-delay:.4s}.hero-cta{animation-delay:.6s}body{cursor:default;}#cur,#cur-ring{display:none;}';
+  document.head.appendChild(s);
+}
 
-/* ── NAV ── */
-nav {
-  position:fixed; top:0; left:0; right:0; z-index:200;
+// LIVE VISITOR WEBSOCKET
+(function(){
+  const onlineEl=document.getElementById('liveOnline'),totalEl=document.getElementById('liveTotal'),widget=document.getElementById('live-widget');
+  const wsUrl=`${location.protocol==='https:'?'wss':'ws'}://${location.host}`;
+  let ws,timer;
+  function anim(el,v){if(parseInt(el.textContent)===v)return;el.style.cssText='transform:translateY(-8px);opacity:0;transition:all 0.2s ease';setTimeout(()=>{el.textContent=v.toLocaleString();el.style.transform='translateY(8px)';setTimeout(()=>{el.style.transform='translateY(0)';el.style.opacity='1';},50);},200);}
+  function connect(){
+    try{ws=new WebSocket(wsUrl);}catch(e){demo();return;}
+    ws.onopen=()=>{clearTimeout(timer);widget.style.opacity='1';};
+    ws.onmessage=e=>{try{const d=JSON.parse(e.data);if(d.type==='stats'){anim(onlineEl,d.online);anim(totalEl,d.total);}}catch(err){}};
+    ws.onclose=()=>{timer=setTimeout(connect,3000);};
+    ws.onerror=()=>{ws.close();demo();};
+  }
+  function demo(){onlineEl.textContent='1';totalEl.textContent='1';widget.style.opacity='1';}
+  connect();
+  window.addEventListener('beforeunload',()=>{if(ws)ws.close();});
+})();
+</script>
+</body>
+</html>
   padding:2rem 4rem; display:flex; justify-content:space-between; align-items:center;
   transition: background 0.4s;
 }
